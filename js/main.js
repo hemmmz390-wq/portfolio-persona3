@@ -36,12 +36,32 @@
 
   // ---------- Foto hero (latar penuh menu) ----------
   const heroEl = $("#hero-bg");
-  if (D.profile.hero) {
+  const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let heroVideo = null;
+  if (D.profile.hero || D.profile.heroVideo) {
     document.body.classList.add("has-hero");
-    heroEl.innerHTML = `<img src="${D.profile.hero}" alt="">`;
+    if (D.profile.heroVideo && !reduceMotion) {
+      heroEl.innerHTML = `<video src="${D.profile.heroVideo}" poster="${D.profile.hero || ""}"
+        autoplay muted loop playsinline preload="auto" disablepictureinpicture></video>`;
+      heroVideo = heroEl.querySelector("video");
+      // kalau video gagal dimuat, kembali ke foto
+      heroVideo.addEventListener("error", () => {
+        if (D.profile.hero) heroEl.innerHTML = `<img src="${D.profile.hero}" alt="">`;
+        heroVideo = null;
+      });
+    } else {
+      heroEl.innerHTML = `<img src="${D.profile.hero}" alt="">`;
+    }
   } else {
     heroEl.remove();
   }
+  // video hanya diputar saat menu utama terlihat (hemat baterai/CPU)
+  const playHero = (on) => heroVideo && (on ? heroVideo.play().catch(() => {}) : heroVideo.pause());
+  // browser bisa menahan video saat tab tidak aktif (hemat daya); lanjutkan lagi saat terlihat / ada interaksi
+  const resumeHero = () => state.view === "menu" && document.visibilityState === "visible" && heroVideo?.paused && playHero(true);
+  document.addEventListener("visibilitychange", resumeHero);
+  addEventListener("pointerdown", resumeHero);
+  addEventListener("keydown", resumeHero);
 
   // ---------- Karakter (gaya ilustrasi P3R) ----------
   const charEl = $("#character");
@@ -98,15 +118,16 @@
     const y = (e.clientY / innerHeight - 0.5) * -12;
     $("#menu-column").style.translate = `${x}px ${y}px`;
     $("#side-number").style.translate = `${-x * 1.5}px ${-y}px`;
-    if (heroEl.isConnected) heroEl.style.translate = `${x * 0.5}px ${y * 0.5}px`;
     if (charEl.isConnected) charEl.style.translate = `${-x * 0.6}px ${-y * 0.4}px`;
   });
 
   // ---------- Transisi antar layar ----------
   const wipe = $("#wipe");
-  function transition(swap) {
+  // p5 = true: sapuan merah-hitam (dipakai saat masuk/keluar layar PHOTOGRAPHY)
+  function transition(swap, p5 = false) {
     state.busy = true;
     wipe.classList.remove("run");
+    wipe.classList.toggle("p5", p5);
     void wipe.offsetWidth;
     wipe.classList.add("run");
     setTimeout(swap, 560); // saat lapisan navy menutup penuh
@@ -121,6 +142,7 @@
     sfx.confirm();
     transition(() => {
       $("#menu").classList.add("away");
+      playHero(false);
       const scr = $(`#screen-${id}`);
       scr.classList.add("open");
       scr.setAttribute("aria-hidden", "false");
@@ -129,7 +151,7 @@
       if (id === "skills") renderSkills();
       if (id === "contact") renderContact();
       if (id === "photography") renderPhoto();
-    });
+    }, id === "photography");
   }
 
   function back() {
@@ -140,8 +162,9 @@
       scr.classList.remove("open");
       scr.setAttribute("aria-hidden", "true");
       $("#menu").classList.remove("away");
+      playHero(true);
       state.view = "menu";
-    });
+    }, state.view === "photography");
   }
   $$("[data-back]").forEach((b) => b.addEventListener("click", back));
 
@@ -281,46 +304,47 @@
     dpad: '<path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/>',
   };
   const pmMenu = $("#pm-menu");
-  const pmChips = $("#pm-chips");
   const hintBar = $("#pm-hint-bar");
-  const photosFor = (id) => (id === "all" ? PH.photos : PH.photos.filter((p) => p.category === id));
-  const hintFor = (b) => (b.type === "about" ? b.hint : `${b.hint} · ${photosFor(b.id).length} foto`);
+  const photosFor = (id) =>
+    id === "all" ? PH.photos : PH.photos.filter((p) => p.category === id || (p.tags || []).includes(id));
+  const hintFor = (b) => `${b.hint} · ${photosFor(b.id).length} foto`;
   const photoButtons = () => $$(".pm-btn", pmMenu);
 
   $("#pm-person").innerHTML = PH.person ? `<img src="${PH.person}" alt="" fetchpriority="high">` : "";
   pmMenu.innerHTML = PH.buttons
     .map((b, i) => {
       const letters = [...b.label]
-        .map((c, j) => `<span class="ch${j === b.invert - 1 ? " inv" : ""}">${c}</span>`)
+        .map((c, j) => (j === b.invert - 1 ? `<span class="inv">${c}</span>` : c))
         .join("");
       const icon = b.icon
         ? `<span class="pm-icon pm-icon-${b.icon}" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS[b.icon]}</svg></span>`
         : "";
       const badge = b.badge ? `<span class="pm-badge" aria-hidden="true">${b.badge}</span>` : "";
-      const end = b.iconSide === "end";
-      return `<button class="pm-btn pm-${b.id}" data-id="${b.id}" style="--x:${b.x};--y:${b.y};--i:${i}"
+      // ikon & badge selalu di sisi yang menghadap sosok
+      const end = b.side === "left";
+      return `<button class="pm-btn pm-${b.id} pm-${b.side}" data-id="${b.id}" style="--x:${b.x};--y:${b.y};--i:${i}"
           aria-label="${b.label}: ${hintFor(b)}">
-        ${end ? "" : icon}
+        ${end ? "" : icon + badge}
         <span class="pm-text" aria-hidden="true"><span class="pm-label">${letters}</span><span class="pm-jp">${b.jp}</span></span>
-        ${end ? icon : ""}${badge}
+        ${end ? icon + badge : ""}
         <span class="pm-hint" aria-hidden="true">${hintFor(b)}</span>
       </button>`;
     })
-    .join("");
-  pmChips.innerHTML = PH.buttons
-    .map((b) => `<button class="pm-chip" data-id="${b.id}">${b.label}<small>${hintFor(b)}</small></button>`)
     .join("");
 
   function showHint(btn) {
     const b = PH.buttons.find((x) => x.id === btn.dataset.id);
     hintBar.innerHTML = `<b>${b.label}</b> ${hintFor(b)}`;
   }
-  $$(".pm-btn, .pm-chip").forEach((btn) => {
+  photoButtons().forEach((btn) => {
     btn.addEventListener("click", () => {
+      if (state.busy || state.overlay) return;
       btn.classList.remove("press");
       void btn.offsetWidth;
       btn.classList.add("press");
-      openCategory(btn.dataset.id, btn);
+      sfx.confirm();
+      // galeri muncul di balik sapuan merah-hitam, sama seperti saat masuk PHOTOGRAPHY
+      transition(() => openCategory(btn.dataset.id, btn), true);
     });
     btn.addEventListener("focus", () => {
       showHint(btn);
@@ -350,10 +374,7 @@
     galleryTrigger = trigger;
     $("#gallery-tag").textContent = b.label;
     $("#gallery-title").textContent = b.title;
-    if (b.type === "about") {
-      $("#gallery-count").textContent = "";
-      galleryBody.innerHTML = aboutPanel();
-    } else {
+    {
       const list = photosFor(id);
       lb.list = list;
       $("#gallery-count").textContent = `${list.length} foto`;
@@ -377,33 +398,20 @@
     galleryBody.scrollTop = 0;
     state.overlay = "gallery";
     lockScroll(true);
-    sfx.confirm();
     $("#gallery-close").focus();
   }
 
-  function aboutPanel() {
-    const pr = D.profile;
-    const award = pr.stats.find(([k]) => k === "AWARD");
-    return `<div class="g-about">
-      ${pr.photo ? `<img class="g-about-photo" src="${pr.photo}" alt="${pr.name}">` : ""}
-      <div>
-        <h3>${pr.name}</h3>
-        <p class="g-about-role">${pr.role}</p>
-        ${award ? `<p class="g-about-award">${award[1]}</p>` : ""}
-        <p>${pr.bio[0]}</p>
-        <ul class="g-about-links">${D.contact
-          .map((c) => `<li><a href="${c.href}" target="_blank" rel="noopener"><b>${c.app}</b> ${c.handle}</a></li>`)
-          .join("")}</ul>
-      </div>
-    </div>`;
-  }
 
+  // tutup galeri di balik sapuan merah-hitam, sama seperti saat membukanya
   function closeGallery() {
-    gallery.hidden = true;
-    state.overlay = null;
-    lockScroll(false);
+    if (state.busy) return;
     sfx.back();
-    if (galleryTrigger) galleryTrigger.focus({ preventScroll: true });
+    transition(() => {
+      gallery.hidden = true;
+      state.overlay = null;
+      lockScroll(false);
+      if (galleryTrigger) galleryTrigger.focus({ preventScroll: true });
+    }, true);
   }
 
   function openLightbox(i, trigger) {
@@ -512,7 +520,7 @@
           e.preventDefault();
           const n = cur < 0 ? 0 : (cur + (next ? 1 : -1) + btns.length) % btns.length;
           btns[n].focus();
-        } else if (ok && document.activeElement.matches(".pm-btn, .pm-chip")) {
+        } else if (ok && document.activeElement.matches(".pm-btn")) {
           document.activeElement.click();
         } else if (esc) back();
         break;

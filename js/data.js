@@ -5,6 +5,7 @@ window.PORTFOLIO = {
     role: "Web Developer / Photographer / Content Creator",
     photo: "assets/profile.webp", // kosongkan untuk avatar inisial
     hero: "assets/hero.webp", // gambar latar penuh menu utama (subjek di kiri, kanan kosong untuk menu) — kosongkan untuk latar laut biasa
+    heroVideo: "assets/hero.mp4", // video latar menu utama (loop, tanpa suara); `hero` dipakai sebagai poster & cadangan — kosongkan untuk foto saja
     character: "", // isi "assets/character-toon.webp" untuk menampilkan karakter lagi (dibuat dengan tools/toonify.py)
     characterPose: "float", // "float" = melayang terbalik di air (ala P3R), "stand" = berdiri tegak
     stats: [
@@ -72,29 +73,32 @@ window.PORTFOLIO = {
 
   // ===== PHOTOGRAPHY (layar menu pertarungan) =====
   // Tambah karya: taruh foto di assets/photography/ (+ versi kecil di assets/photography/thumbs/),
-  // lalu tambahkan satu entri di `photos`. `category` harus salah satu id di bawah (street/portrait/still/event).
+  // lalu tambahkan satu entri di `photos`. `category` = street/portrait/still/event; `tags: ["award"]` (opsional)
+  // membuat foto ikut muncul juga di tombol dengan id yang sama.
   photography: {
     person: "assets/character.webp", // foto potongan berlatar transparan untuk sosok di tengah
-    // x / y = posisi tombol dalam persen terhadap artboard persegi. invert = huruf ke-berapa yang dibalik warnanya.
+    // Dua kolom mengapit sosok. side: "left" | "right".
+    // x = jarak tepi tombol yang menghadap sosok dari tepi luar artboard (%), y = posisi atas (%).
+    // invert = huruf ke-berapa yang dibalik warnanya (0 = tidak ada).
     buttons: [
-      { id: "all", label: "ORDER", jp: "作戦を指示する", badge: "L2", title: "Semua Karya", hint: "Semua karya", x: 1, y: 24, invert: 1 },
-      { id: "street", label: "GUN", jp: "銃を構える", icon: "dpad", iconSide: "end", title: "Street & Travel", hint: "Street & travel", x: 0, y: 50, invert: 1 },
-      { id: "portrait", label: "PERSONA", jp: "スキルを使う", icon: "triangle", title: "Portrait", hint: "Portrait", x: 52, y: 29, invert: 5 },
-      { id: "still", label: "ITEM", jp: "アイテムを使う", icon: "square", title: "Product & Still-life", hint: "Product & still-life", x: 41, y: 49, invert: 2 },
-      { id: "event", label: "SWORD", jp: "近接武器で攻撃", icon: "circle", title: "Event & Action", hint: "Event & action", x: 69, y: 55, invert: 3 },
-      { id: "about", label: "GUARD", jp: "防御する", icon: "cross", title: "About Elbert", hint: "Tentang saya & kontak", x: 50, y: 75, invert: 1, type: "about" },
+      { id: "all", label: "ALL", jp: "すべての作品", badge: "L2", title: "Semua Karya", hint: "Semua karya", side: "left", x: 63, y: 14, invert: 2 },
+      { id: "street", label: "STREET", jp: "ストリート", icon: "dpad", title: "Street & Travel", hint: "Street & travel", side: "left", x: 66, y: 41, invert: 3 },
+      { id: "still", label: "PRODUCT", jp: "プロダクト", icon: "square", title: "Product & Still-life", hint: "Product & still-life", side: "left", x: 63, y: 68, invert: 3 },
+      { id: "portrait", label: "PORTRAIT", jp: "ポートレート", icon: "triangle", title: "Portrait", hint: "Portrait", side: "right", x: 63, y: 14, invert: 5 },
+      { id: "event", label: "EVENT", jp: "イベント", icon: "circle", title: "Event & Action", hint: "Event & action", side: "right", x: 66, y: 41, invert: 3 },
+      { id: "award", label: "AWARD", jp: "受賞作品", icon: "cross", title: "Award Winning", hint: "Foto juara lomba", side: "right", x: 63, y: 68, invert: 3 },
     ],
     // field opsional: location, year, description — tampil hanya kalau diisi
     photos: [
       {
-        id: "reading-room", title: "Reading Room", category: "portrait",
+        id: "reading-room", title: "Reading Room", category: "award",
         src: "assets/photography/award-reading-room-wide.webp", thumbnail: "assets/photography/thumbs/award-reading-room-wide.webp",
         width: 1401, height: 787,
         alt: "Seseorang duduk di kursi membaca selembar kertas di ruangan gelap, diapit dua lemari tinggi",
         description: "Juara 3 — ENLIGHT 2025 Photography Competition",
       },
       {
-        id: "table-light", title: "Table Light", category: "portrait",
+        id: "table-light", title: "Table Light", category: "award",
         src: "assets/photography/award-table-light.webp", thumbnail: "assets/photography/thumbs/award-table-light.webp",
         width: 1280, height: 719,
         alt: "Seseorang menyandarkan kepala di lengan pada meja putih, cahaya matahari membentuk pola lembut di dinding",
@@ -135,6 +139,108 @@ window.PORTFOLIO = {
         src: "assets/photography/sunset-jump-field.webp", thumbnail: "assets/photography/thumbs/sunset-jump-field.webp",
         width: 965, height: 543,
         alt: "Dua siluet orang melompat di atas lapangan saat matahari terbenam rendah di belakang mereka",
+      },
+      {
+        id: "product-coffee-cake", title: "Coffee Cake", category: "still",
+        src: "assets/photography/product-coffee-cake.webp", thumbnail: "assets/photography/thumbs/product-coffee-cake.webp",
+        width: 1499, height: 2000,
+        alt: "Potongan kue kopi berlapis dengan krim bergelombang dan sebutir biji kopi di atasnya, di atas kertas putih berlatar kuning",
+      },
+      {
+        id: "product-pain-au-chocolat", title: "Pain au Chocolat", category: "still",
+        src: "assets/photography/product-pain-au-chocolat.webp", thumbnail: "assets/photography/thumbs/product-pain-au-chocolat.webp",
+        width: 1333, height: 2000,
+        alt: "Pain au chocolat berlapis dengan garis cokelat di atas piring keramik bertotol, disorot cahaya kuning",
+      },
+      {
+        id: "product-good-day-leaves", title: "Good Day on Leaves", category: "still",
+        src: "assets/photography/product-good-day-leaves.webp", thumbnail: "assets/photography/thumbs/product-good-day-leaves.webp",
+        width: 853, height: 1280,
+        alt: "Botol Good Day Cappuccino tergeletak di antara dedaunan hijau dan batu",
+      },
+      {
+        id: "product-good-day-doodle", title: "Coffee Every Day", category: "still",
+        src: "assets/photography/product-good-day-doodle.webp", thumbnail: "assets/photography/thumbs/product-good-day-doodle.webp",
+        width: 853, height: 1280,
+        alt: "Botol Good Day Cappuccino di atas rumput, dihiasi coretan ilustrasi putih bertuliskan Good Day dan coffee every day",
+      },
+      {
+        id: "product-lucky-cat", title: "Lucky Cat", category: "still",
+        src: "assets/photography/product-lucky-cat.webp", thumbnail: "assets/photography/thumbs/product-lucky-cat.webp",
+        width: 726, height: 1280,
+        alt: "Patung kucing keberuntungan putih dengan koin emas di dalam kotak akrilik bening beralas merah",
+      },
+      {
+        id: "street-forest-light", title: "Forest Light", category: "street",
+        src: "assets/photography/street-forest-light.webp", thumbnail: "assets/photography/thumbs/street-forest-light.webp",
+        width: 720, height: 1280,
+        alt: "Cahaya matahari menembus celah pepohonan tinggi di hutan, menerangi semak di bawahnya",
+      },
+      {
+        id: "street-canopy", title: "Canopy", category: "street",
+        src: "assets/photography/street-canopy.webp", thumbnail: "assets/photography/thumbs/street-canopy.webp",
+        width: 900, height: 1600,
+        alt: "Kanopi pohon rimbun difoto dari bawah, cabang-cabang menjulang ke langit biru",
+      },
+      {
+        id: "street-paddy-flag", title: "Paddy & Flag", category: "street",
+        src: "assets/photography/street-paddy-flag.webp", thumbnail: "assets/photography/thumbs/street-paddy-flag.webp",
+        width: 853, height: 1280,
+        alt: "Bendera merah putih berkibar di atas gubuk beratap hijau di tengah sawah",
+      },
+      {
+        id: "street-golden-grass", title: "Golden Grass", category: "street",
+        src: "assets/photography/street-golden-grass.webp", thumbnail: "assets/photography/thumbs/street-golden-grass.webp",
+        width: 853, height: 1280,
+        alt: "Siluet rumput liar dan pepohonan saat matahari terbenam dengan langit keemasan",
+      },
+      {
+        id: "street-village-road", title: "Village Road", category: "street",
+        src: "assets/photography/street-village-road.webp", thumbnail: "assets/photography/thumbs/street-village-road.webp",
+        width: 1187, height: 1600,
+        alt: "Jalan desa beraspal di antara sawah dan pepohonan, seseorang berjalan menjauh menuju rumah-rumah",
+      },
+      {
+        id: "street-coastal-rock", title: "Coastal Rock", category: "street",
+        src: "assets/photography/street-coastal-rock.webp", thumbnail: "assets/photography/thumbs/street-coastal-rock.webp",
+        width: 776, height: 1034,
+        alt: "Tebing batu karang berwarna jingga menjorok di atas pantai berbatu saat air surut",
+      },
+      {
+        id: "street-temple-roof", title: "Temple Roof", category: "street",
+        src: "assets/photography/street-temple-roof.webp", thumbnail: "assets/photography/thumbs/street-temple-roof.webp",
+        width: 1125, height: 1500,
+        alt: "Atap kelenteng berornamen naga dan ukiran warna-warni di bawah langit biru",
+      },
+      {
+        id: "street-guardian-statues", title: "Guardian Statues", category: "street",
+        src: "assets/photography/street-guardian-statues.webp", thumbnail: "assets/photography/thumbs/street-guardian-statues.webp",
+        width: 1280, height: 959,
+        alt: "Dua patung berwarna dengan ornamen emas berdiri di depan dinding batu bertingkat",
+      },
+      {
+        id: "portrait-lattice-window", title: "Lattice Window", category: "portrait",
+        src: "assets/photography/portrait-lattice-window.webp", thumbnail: "assets/photography/thumbs/portrait-lattice-window.webp",
+        width: 915, height: 1600,
+        alt: "Seseorang duduk dalam bayangan di depan jendela berteralis kisi, cahaya redup dari luar",
+      },
+      {
+        id: "portrait-touch", title: "Touch", category: "portrait",
+        src: "assets/photography/portrait-touch.webp", thumbnail: "assets/photography/thumbs/portrait-touch.webp",
+        width: 853, height: 1280,
+        alt: "Sebuah tangan menyentuh helai daun panjang dalam gelap",
+      },
+      {
+        id: "portrait-amber-window", title: "Amber Window", category: "portrait",
+        src: "assets/photography/portrait-amber-window.webp", thumbnail: "assets/photography/thumbs/portrait-amber-window.webp",
+        width: 853, height: 1280,
+        alt: "Siluet seseorang di depan jendela bertirai yang diterangi cahaya jingga",
+      },
+      {
+        id: "event-night-parade", title: "Night Parade", category: "event",
+        src: "assets/photography/event-night-parade.webp", thumbnail: "assets/photography/thumbs/event-night-parade.webp",
+        width: 720, height: 1280,
+        alt: "Kerumunan orang di jalan pada malam hari mengiringi arak-arakan dengan lampu biru dan merah",
       },
     ],
   },

@@ -31,13 +31,14 @@ Lalu buka http://localhost:5173.
 ```js
 {
   id: "nama-unik", title: "Judul", category: "street", // street | portrait | still | event
+  tags: ["award"], // opsional: ikut tampil di tombol AWARD
   src: "assets/photography/foto.webp", thumbnail: "assets/photography/thumbs/foto.webp",
   width: 2000, height: 1333, alt: "Deskripsi isi foto",
   location: "", year: "", description: "", // opsional, tampil hanya kalau diisi
 },
 ```
 
-Tombol ORDER/GUN/PERSONA/ITEM/SWORD/GUARD, posisinya (`x`, `y` dalam %), dan kategori yang dibukanya diatur di `photography.buttons`.
+Tombol ALL/STREET/PRODUCT/PORTRAIT/EVENT/AWARD, posisinya (`x`, `y` dalam %), dan kategori yang dibukanya diatur di `photography.buttons`.
 
 ## Mengubah konten
 

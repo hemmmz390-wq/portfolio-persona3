@@ -137,13 +137,14 @@ a { color: inherit; text-decoration: none; }
 
 /* Foto hero: latar penuh, subjek di kiri, sisi kanan untuk menu */
 .hero-bg {
-  position: absolute; inset: -12px; z-index: 0; overflow: hidden;
-  transition: translate .2s linear, opacity .5s, filter .5s;
+  position: absolute; inset: 0; z-index: 0; overflow: hidden;
+  transition: opacity .5s, filter .5s;
 }
-.hero-bg img {
-  width: 100%; height: 100%; object-fit: cover; object-position: 30% 22%;
-  animation: hero-drift 26s ease-in-out infinite alternate;
+.hero-bg img, .hero-bg video {
+  display: block; width: 100%; height: 100%; object-fit: cover; object-position: 30% 22%;
 }
+/* foto diam diberi gerak pelan; video sudah bergerak sendiri */
+.hero-bg img { animation: hero-drift 26s ease-in-out infinite alternate; }
 @keyframes hero-drift { from { transform: scale(1.03); } to { transform: scale(1.09) translate(-1%, .8%); } }
 /* gelapkan kanan & bawah supaya menu dan teks tetap terbaca */
 .hero-bg::after {
@@ -457,6 +458,9 @@ a { color: inherit; text-decoration: none; }
 .wipe-a { background: var(--cyan); z-index: 1; }
 .wipe-c { background: var(--white); z-index: 2; }
 .wipe-b { background: var(--ink); z-index: 3; }
+/* varian merah-hitam untuk layar PHOTOGRAPHY (tema Persona 5) */
+.wipe.p5 .wipe-a { background: #ff1f3d; }
+.wipe.p5 .wipe-b { background: #0b0b0d; }
 .wipe.run .wipe-a { animation: sweep .9s 0s cubic-bezier(.7, 0, .3, 1) both; }
 .wipe.run .wipe-c { animation: sweep .9s .06s cubic-bezier(.7, 0, .3, 1) both; }
 .wipe.run .wipe-b { animation: sweep .9s .12s cubic-bezier(.7, 0, .3, 1) both; }
@@ -469,7 +473,7 @@ a { color: inherit; text-decoration: none; }
 /* ============ Responsif ============ */
 @media (max-width: 860px) {
   .menu-item { font-size: clamp(36px, min(10vw, 11vh), 84px) !important; }
-  .hero-bg img { object-position: 34% 20%; }
+  .hero-bg img, .hero-bg video { object-position: 34% 20%; }
   .hero-bg::after { background: linear-gradient(90deg, rgba(0, 10, 40, .2), rgba(0, 10, 40, .6)), linear-gradient(to top, rgba(0, 8, 30, .8), transparent 40%); }
   .menu-screen:has(.pose-float) .profile-header { left: 4vw; right: auto; align-items: flex-start; text-align: left; }
   body { overflow: auto; }
@@ -505,15 +509,15 @@ a { color: inherit; text-decoration: none; }
 
 /* ================================================================
    PHOTOGRAPHY — menu pertarungan ala Persona 5
-   Artboard persegi; posisi tombol dalam % (lihat data.js), ukuran dalam cqw
-   supaya tombol ikut skala artboard, bukan viewport.
+   Desktop: artboard 16:10, sosok di tengah, dua kolom tombol mengapitnya.
+   HP: foto di atas, tombol dalam grid 2 kolom. Ukuran dalam cqw (lebar artboard).
    ================================================================ */
 .photo-screen {
   --p5red: #ff1f3d;
   --p5ink: #0b0b0d;
   padding: 2vh 3vw 84px;
   background:
-    radial-gradient(70% 60% at 50% 45%, rgba(255, 31, 61, .12), transparent 70%),
+    radial-gradient(60% 55% at 50% 45%, rgba(255, 31, 61, .1), transparent 70%),
     #0a0a0c;
 }
 .pm-title {
@@ -523,94 +527,81 @@ a { color: inherit; text-decoration: none; }
 }
 .pm-title span { background: var(--p5red); padding: 0 .18em; margin-right: .06em; display: inline-block; transform: rotate(-3deg); }
 
-.pm-stage { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.pm-stage { min-height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
 .pm-art {
   position: relative; container-type: inline-size;
-  width: min(100%, calc(100vh - 150px), 880px); aspect-ratio: 1;
+  width: min(100%, calc((100vh - 150px) * 1.6), 1180px); aspect-ratio: 16 / 10;
 }
 
-/* latar: gelap, halftone, dua sayatan merah — pinggirnya memudar ke latar halaman */
+/* ---- lapisan visual: latar, semburan, sosok ---- */
+.pm-visual { position: absolute; inset: 0; }
 .pm-bg {
-  position: absolute; inset: 0; z-index: 0;
+  position: absolute; inset: 0;
   background:
-    linear-gradient(-32deg, transparent 63%, var(--p5red) 63% 66.5%, transparent 66.5%),
-    linear-gradient(-32deg, transparent 20%, rgba(255, 31, 61, .55) 20% 21.4%, transparent 21.4%),
-    radial-gradient(rgba(255, 255, 255, .09) 22%, transparent 26%) 0 0 / 1.3cqw 1.3cqw,
-    radial-gradient(circle at 50% 42%, #2b2b31 0%, #141417 55%, #0a0a0c 100%);
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 58%, transparent 72%);
-  mask-image: radial-gradient(circle at 50% 50%, #000 58%, transparent 72%);
+    linear-gradient(-28deg, transparent 58%, rgba(255, 31, 61, .9) 58% 59.6%, transparent 59.6%),
+    radial-gradient(rgba(255, 255, 255, .08) 22%, transparent 26%) 0 0 / .9cqw .9cqw,
+    radial-gradient(ellipse at 50% 40%, #26262b 0%, #131316 50%, #0a0a0c 100%);
+  -webkit-mask-image: radial-gradient(ellipse 50% 55% at 50% 50%, #000 70%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 55% at 50% 50%, #000 70%, transparent 100%);
 }
 .pm-burst {
-  position: absolute; left: 0; top: 14%; width: 100%; height: 66%; z-index: 1;
-  fill: var(--p5red); stroke: var(--p5ink); stroke-width: .7; stroke-linejoin: miter;
+  position: absolute; left: 30%; top: 1%; width: 40%; height: 78%;
+  fill: var(--p5red); stroke: var(--p5ink); stroke-width: .6; stroke-linejoin: miter;
 }
 .screen.open .pm-burst { animation: pm-burst .45s .1s var(--ease) backwards; }
-@keyframes pm-burst { from { transform: scale(.4) rotate(-20deg); opacity: 0; } }
-
+@keyframes pm-burst { from { transform: scale(.5) rotate(-15deg); opacity: 0; } }
 .pm-person {
-  position: absolute; left: 50%; bottom: 0; z-index: 2;
-  height: 94%; aspect-ratio: 652 / 1216; translate: -50% 0;
+  position: absolute; left: 50%; bottom: 0; height: 97%;
+  aspect-ratio: 652 / 1216; translate: -50% 0;
 }
 .pm-person img {
   width: 100%; height: 100%; object-fit: contain; object-position: bottom center; display: block;
   /* siluet merah bergeser + garis hitam tipis, seperti referensi */
-  filter: drop-shadow(-1.4cqw -.7cqw 0 var(--p5red)) drop-shadow(.3cqw .2cqw 0 var(--p5ink));
+  filter: drop-shadow(-.9cqw -.5cqw 0 var(--p5red)) drop-shadow(.2cqw .15cqw 0 var(--p5ink));
 }
 .screen.open .pm-person { animation: pm-person .5s var(--ease) backwards; }
 @keyframes pm-person { from { opacity: 0; translate: -50% 4%; } }
 
-/* ---- tombol menu ---- */
+/* ---- tombol ---- */
 .pm-menu { position: absolute; inset: 0; z-index: 3; }
 .pm-btn {
-  position: absolute; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%);
-  display: flex; align-items: center; gap: 1.4cqw;
-  padding: 1.3cqw 4cqw 1.8cqw 2.6cqw;
+  --dir: 1;
+  position: absolute; top: calc(var(--y) * 1%);
+  display: flex; align-items: center; gap: 1.2cqw;
+  min-width: 23cqw; padding: 1cqw 2.2cqw 1.2cqw;
   color: #fff; isolation: isolate; cursor: pointer;
-  transform: rotate(-12deg); transform-origin: left center;
-  transition: transform .18s var(--ease);
+  transform: rotate(-7deg);
+  transition: transform .18s var(--ease), color .15s;
 }
+.pm-left { --dir: -1; right: calc(var(--x) * 1%); justify-content: flex-end; transform-origin: right center; }
+.pm-right { left: calc(var(--x) * 1%); justify-content: flex-start; transform-origin: left center; }
 .pm-btn::before {
   content: ""; position: absolute; inset: 0; z-index: -1;
-  background: var(--p5ink);
-  clip-path: polygon(0 16%, 100% 0, 95% 100%, 3% 86%);
+  background: var(--p5ink); box-shadow: inset 0 0 0 .18cqw rgba(255, 255, 255, .85);
+  clip-path: polygon(1.5% 8%, 100% 0, 98.5% 100%, 0 92%);
+  transition: background .15s;
 }
+/* sayatan merah di sisi luar tombol */
 .pm-btn::after {
-  content: ""; position: absolute; z-index: -2;
-  left: 34%; right: -7%; top: 26%; bottom: -20%;
-  background: var(--p5red);
-  clip-path: polygon(0 45%, 100% 0, 86% 100%, 10% 74%);
-  transform-origin: left center; transition: transform .2s var(--ease);
+  content: ""; position: absolute; z-index: -2; top: 14%; bottom: 14%; width: 3.6cqw;
+  background: var(--p5red); transition: transform .18s var(--ease);
 }
-.pm-btn:hover, .pm-btn:focus { transform: rotate(-12deg) translate(.9cqw, -.5cqw) scale(1.07); }
-.pm-btn:hover::after, .pm-btn:focus::after { transform: scaleX(1.22) translateX(.8cqw); }
-.pm-btn:focus-visible { outline: .4cqw solid #fff; outline-offset: .5cqw; }
-.pm-btn:focus::before { background: #fff; }
-.pm-btn:focus { color: var(--p5ink); }
-.pm-btn:focus .ch.inv { background: var(--p5ink); color: #fff; }
-.pm-btn.press { animation: pm-press .2s ease; }
-@keyframes pm-press { 50% { transform: rotate(-12deg) scale(.93); } }
-.screen.open .pm-btn { animation: pm-in .32s calc(var(--i) * 60ms + .25s) var(--ease) backwards; }
-@keyframes pm-in { from { opacity: 0; transform: rotate(-12deg) translateX(-5cqw) scale(.85); } }
+.pm-left::after { left: -2.6cqw; clip-path: polygon(100% 0, 100% 100%, 0 62%); transform-origin: right center; }
+.pm-right::after { right: -2.6cqw; clip-path: polygon(0 0, 100% 38%, 0 100%); transform-origin: left center; }
 
 .pm-text { display: flex; flex-direction: column; }
-.pm-label {
-  display: flex; align-items: flex-end;
-  font: 400 8.4cqw/.86 "Anton", var(--display); letter-spacing: -.005em;
-}
-/* huruf campur ala Persona 5 */
-.ch { display: inline-block; }
-.ch:nth-child(odd) { font-size: 1.08em; transform: rotate(-2deg); }
-.ch:nth-child(3n) { font-family: "Barlow Condensed", sans-serif; font-weight: 900; font-style: italic; font-size: 1.14em; }
-.ch.inv { background: #fff; color: var(--p5ink); padding: 0 .06em; margin: 0 .03em; transform: rotate(5deg) translateY(.03em); }
+.pm-left .pm-text { align-items: flex-end; }
+.pm-label { font: 400 4.3cqw/.9 "Anton", var(--display); letter-spacing: .01em; white-space: nowrap; }
+.pm-label .inv { display: inline-block; background: #fff; color: var(--p5ink); padding: 0 .07em; margin: 0 .03em; line-height: .95; }
 .pm-jp {
-  margin-top: .5cqw;
-  font: 700 2.35cqw/1.1 "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
-  letter-spacing: .06em;
+  margin-top: .35cqw; color: #e6e6ea;
+  font: 700 1.2cqw/1.1 "Yu Gothic", "Hiragino Kaku Gothic ProN", "Meiryo", "Noto Sans JP", sans-serif;
+  letter-spacing: .08em; white-space: nowrap;
 }
 .pm-icon {
   flex: none; display: grid; place-items: center;
-  width: 6.8cqw; height: 6.8cqw; border-radius: 50%;
-  background: var(--p5ink); border: .45cqw solid #fff; box-shadow: 0 0 0 .35cqw var(--p5ink);
+  width: 3.8cqw; height: 3.8cqw; border-radius: 50%;
+  background: var(--p5ink); border: .3cqw solid #fff;
 }
 .pm-icon svg { width: 62%; height: 62%; fill: none; stroke-width: 2.4; stroke-linejoin: round; stroke-linecap: round; }
 .pm-icon-triangle svg { stroke: #45e0c8; }
@@ -619,31 +610,64 @@ a { color: inherit; text-decoration: none; }
 .pm-icon-square svg { stroke: #ff94da; }
 .pm-icon-dpad svg { stroke: #fff; stroke-width: 1.8; }
 .pm-badge {
-  align-self: flex-end; margin: 0 0 -1.2cqw .4cqw;
-  font: 900 3.4cqw/1 "Barlow Condensed", sans-serif; color: var(--p5ink);
-  background: #fff; border: .35cqw solid var(--p5ink); border-radius: .9cqw; padding: .25cqw 1cqw;
+  flex: none; font: 900 1.7cqw/1 "Barlow Condensed", sans-serif; color: var(--p5ink);
+  background: #fff; border-radius: .5cqw; padding: .3cqw .7cqw;
 }
 .pm-hint {
-  position: absolute; left: 2.2cqw; top: 100%; margin-top: .4cqw;
-  white-space: nowrap; pointer-events: none;
-  background: #fff; color: var(--p5ink); font: 700 2.1cqw/1 var(--body); padding: .6cqw 1.2cqw;
-  opacity: 0; transform: translateY(-.6cqw); transition: opacity .18s, transform .18s;
+  position: absolute; top: 100%; margin-top: .5cqw; white-space: nowrap; pointer-events: none;
+  background: var(--p5red); color: #fff; font: 700 1.1cqw/1 var(--body); padding: .5cqw .9cqw;
+  opacity: 0; transform: translateY(-.5cqw); transition: opacity .18s, transform .18s;
 }
+.pm-left .pm-hint { right: 2.2cqw; }
+.pm-right .pm-hint { left: 2.2cqw; }
+
+/* aktif: plat putih, teks hitam, bergeser keluar */
+.pm-btn:hover, .pm-btn:focus { color: var(--p5ink); transform: rotate(-7deg) translateX(calc(var(--dir) * .9cqw)) scale(1.04); }
+.pm-btn:hover::before, .pm-btn:focus::before { background: #fff; }
+.pm-btn:hover .pm-label .inv, .pm-btn:focus .pm-label .inv { background: var(--p5ink); color: #fff; }
+.pm-btn:hover .pm-jp, .pm-btn:focus .pm-jp { color: var(--p5ink); }
+.pm-btn:hover::after, .pm-btn:focus::after { transform: scaleX(1.6); }
 .pm-btn:hover .pm-hint, .pm-btn:focus .pm-hint { opacity: 1; transform: none; }
+.pm-btn:focus-visible { outline: .3cqw solid var(--p5red); outline-offset: .5cqw; }
+.pm-btn.press { animation: pm-press .2s ease; }
+@keyframes pm-press { 50% { transform: rotate(-7deg) scale(.95); } }
+.screen.open .pm-btn { animation: pm-in .3s calc(var(--i) * 55ms + .25s) var(--ease) backwards; }
+@keyframes pm-in { from { opacity: 0; transform: rotate(-7deg) translateX(calc(var(--dir) * 4cqw)); } }
 
 .pm-hint-bar { min-height: 1.4em; font: italic 600 14px var(--body); color: #cfcfd4; text-align: center; }
 .pm-hint-bar b { font: 400 16px "Anton", sans-serif; color: var(--p5red); margin-right: 6px; letter-spacing: .03em; font-style: normal; }
 
-/* navigasi kategori tambahan untuk layar kecil */
-.pm-chips { display: none; }
-.pm-chip {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
-  padding: 8px 14px 9px; background: var(--p5ink); color: #fff; text-align: left;
-  border-left: 4px solid var(--p5red); font: 400 18px/1 "Anton", sans-serif;
-  clip-path: polygon(0 0, 100% 0, 95% 100%, 0 100%);
+/* ---- HP / layar tegak: foto di atas, tombol grid 2 kolom ---- */
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .pm-art { aspect-ratio: auto; width: min(100%, 560px); }
+  .pm-visual { position: relative; aspect-ratio: 1 / 1; }
+  .pm-burst { left: 16%; width: 68%; top: 2%; height: 80%; }
+  .pm-person { height: 100%; }
+  .pm-person img { filter: drop-shadow(-1.6cqw -.9cqw 0 var(--p5red)) drop-shadow(.3cqw .2cqw 0 var(--p5ink)); }
+  .pm-menu {
+    position: relative; inset: auto; margin-top: -6cqw;
+    display: grid; grid-template-rows: repeat(3, auto); grid-auto-flow: column; grid-auto-columns: 1fr;
+    gap: 3cqw 4cqw; padding: 0 2cqw;
+  }
+  .pm-btn {
+    position: relative; left: auto; right: auto; top: auto; min-width: 0;
+    gap: 2cqw; padding: 2.2cqw 3cqw 2.6cqw; transform: rotate(-4deg);
+  }
+  .pm-left { justify-content: flex-end; }
+  .pm-label { font-size: 7.4cqw; }
+  .pm-jp { font-size: 2.5cqw; margin-top: .6cqw; }
+  .pm-icon { width: 7cqw; height: 7cqw; border-width: .55cqw; }
+  .pm-badge { font-size: 3.4cqw; border-radius: 1cqw; padding: .6cqw 1.3cqw; }
+  .pm-btn::after { width: 5cqw; }
+  .pm-left::after { left: -2.4cqw; }
+  .pm-right::after { right: -2.4cqw; }
+  .pm-hint { display: none; }
+  .pm-btn:hover, .pm-btn:focus { transform: rotate(-4deg) scale(1.03); }
+  .pm-btn:focus-visible { outline-width: .6cqw; }
+  @keyframes pm-press { 50% { transform: rotate(-4deg) scale(.95); } }
+  .screen.open .pm-btn { animation-name: pm-in-m; }
+  @keyframes pm-in-m { from { opacity: 0; transform: rotate(-4deg) translateY(4cqw); } }
 }
-.pm-chip small { font: 600 11px var(--body); color: #bbb; }
-.pm-chip:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
 /* ---- galeri / profil ---- */
 body.locked .screen { overflow: hidden; }
@@ -669,7 +693,7 @@ body.locked .screen { overflow: hidden; }
   padding: 6px 10px; font: 600 14px var(--body); color: #fff;
 }
 .gallery-close:hover { color: #ff1f3d; }
-.gallery-close:focus-visible, .g-item:focus-visible, .g-about a:focus-visible,
+.gallery-close:focus-visible, .g-item:focus-visible,
 .lb-nav:focus-visible, .lb-close:focus-visible { outline: 3px solid #ff1f3d; outline-offset: 3px; }
 .gallery-body { flex: 1; overflow-y: auto; padding: 24px 4vw 48px; }
 
@@ -700,16 +724,6 @@ body.locked .screen { overflow: hidden; }
 }
 .g-empty strong { display: block; margin-bottom: 8px; font: 400 30px "Anton", sans-serif; color: #fff; letter-spacing: .02em; }
 
-.g-about { display: grid; grid-template-columns: minmax(160px, 260px) 1fr; gap: 28px; max-width: 920px; align-items: start; }
-.g-about-photo { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; clip-path: polygon(4% 0, 100% 3%, 96% 100%, 0 97%); }
-.g-about h3 { font: 400 clamp(36px, 4.5vw, 56px)/1 "Anton", sans-serif; letter-spacing: .01em; }
-.g-about .g-about-role { margin: 8px 0 12px; color: #ff1f3d; font: 600 15px var(--body); }
-.g-about .g-about-award { display: inline-block; margin-bottom: 14px; padding: 4px 12px; background: #fff; color: #0b0b0d; font: 700 13px var(--body); }
-.g-about p { line-height: 1.7; color: #d9d9de; }
-.g-about-links { margin-top: 18px; display: grid; gap: 8px; }
-.g-about-links a { display: inline-flex; gap: 10px; padding: 8px 14px; background: #17171b; border-left: 4px solid #ff1f3d; font-size: 14px; }
-.g-about-links a:hover { background: #222228; }
-.g-about-links b { font: 400 15px "Anton", sans-serif; letter-spacing: .04em; min-width: 82px; }
 
 /* ---- lightbox ---- */
 .lightbox {
@@ -741,10 +755,6 @@ body.locked .screen { overflow: hidden; }
 
 @media (max-width: 640px) {
   .photo-screen { padding: 56px 12px 96px; }
-  .pm-art { width: 100%; }
-  .pm-chips { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; max-width: 440px; }
-  .g-about { grid-template-columns: 1fr; }
-  .g-about-photo { max-width: 220px; }
   .lightbox { padding: 56px 8px 90px; }
   .lb-img { max-width: calc(100vw - 16px); max-height: calc(100vh - 200px); }
   .lb-nav { top: auto; bottom: 18px; translate: none; }
