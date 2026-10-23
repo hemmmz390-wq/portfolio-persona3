@@ -23,6 +23,22 @@ python -m http.server 5173
 
 Lalu buka http://localhost:5173.
 
+## Menambah karya foto (layar PHOTOGRAPHY)
+
+1. Taruh foto di `assets/photography/` dan versi kecilnya (lebar ±720px) di `assets/photography/thumbs/`.
+2. Tambahkan satu entri di `photography.photos` dalam `js/data.js`:
+
+```js
+{
+  id: "nama-unik", title: "Judul", category: "street", // street | portrait | still | event
+  src: "assets/photography/foto.webp", thumbnail: "assets/photography/thumbs/foto.webp",
+  width: 2000, height: 1333, alt: "Deskripsi isi foto",
+  location: "", year: "", description: "", // opsional, tampil hanya kalau diisi
+},
+```
+
+Tombol ORDER/GUN/PERSONA/ITEM/SWORD/GUARD, posisinya (`x`, `y` dalam %), dan kategori yang dibukanya diatur di `photography.buttons`.
+
 ## Mengubah konten
 
 Edit `js/data.js` saja. Setelah mengubah CSS/JS, naikkan angka `?v=` di `index.html` supaya browser tidak memakai versi lama.

@@ -23,8 +23,8 @@
   <meta name="twitter:image" content="https://elbert-persona.vercel.app/assets/og.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,700;1,800;1,900&family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="css/style.css?v=25">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,800;1,700;1,800;1,900&family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=29">
 </head>
 <body>
   <!-- Latar laut: gradien + sinar cahaya + gelembung (diisi JS) -->
@@ -145,10 +145,58 @@
     </div>
   </section>
 
+  <!-- PHOTOGRAPHY: menu pertarungan ala Persona 5 -->
+  <section id="screen-photography" class="screen photo-screen" aria-hidden="true" aria-labelledby="pm-title">
+    <h1 class="pm-title" id="pm-title"><span>PHOTO</span>GRAPHY</h1>
+    <div class="pm-stage">
+      <div class="pm-art" id="pm-art">
+        <div class="pm-bg" aria-hidden="true"></div>
+        <svg class="pm-burst" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polygon points="50,8 44,30 20,2 34,34 0,22 26,44 2,56 30,54 8,82 38,62 34,100 50,70 62,100 64,64 92,86 72,54 100,60 76,42 98,24 70,34 82,4 58,30" />
+        </svg>
+        <div class="pm-person" id="pm-person" aria-hidden="true"></div>
+        <nav class="pm-menu" id="pm-menu" aria-label="Kategori fotografi"></nav>
+      </div>
+      <p class="pm-hint-bar" id="pm-hint-bar" aria-live="polite"></p>
+      <nav class="pm-chips" id="pm-chips" aria-label="Kategori fotografi (daftar)"></nav>
+    </div>
+    <div class="hud hud-bottom">
+      <span class="key">↑↓</span><span>Pilih</span>
+      <span class="key">ENTER</span><span>Buka</span>
+      <button class="key key-btn" data-back>ESC</button><span>Kembali</span>
+    </div>
+  </section>
+
+  <!-- Galeri / profil (di atas layar PHOTOGRAPHY) -->
+  <div class="gallery" id="gallery" role="dialog" aria-modal="true" aria-labelledby="gallery-title" hidden>
+    <header class="gallery-head">
+      <span class="gallery-tag" id="gallery-tag"></span>
+      <h2 class="gallery-title" id="gallery-title"></h2>
+      <span class="gallery-count" id="gallery-count"></span>
+      <button class="gallery-close" id="gallery-close" aria-label="Tutup galeri"><span class="key">ESC</span> Tutup</button>
+    </header>
+    <div class="gallery-body" id="gallery-body"></div>
+  </div>
+
+  <!-- Lightbox foto -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" hidden>
+    <figure class="lb-figure">
+      <img class="lb-img" id="lb-img" alt="">
+      <figcaption class="lb-caption">
+        <span class="lb-counter" id="lb-counter"></span>
+        <strong class="lb-title" id="lb-title"></strong>
+        <span class="lb-meta" id="lb-meta"></span>
+      </figcaption>
+    </figure>
+    <button class="lb-nav lb-prev" id="lb-prev" aria-label="Foto sebelumnya">‹</button>
+    <button class="lb-nav lb-next" id="lb-next" aria-label="Foto berikutnya">›</button>
+    <button class="lb-close" id="lb-close" aria-label="Tutup foto"><span class="key">ESC</span></button>
+  </div>
+
   <!-- Transisi sapuan diagonal -->
   <div class="wipe" id="wipe" aria-hidden="true"><div class="wipe-a"></div><div class="wipe-b"></div><div class="wipe-c"></div></div>
 
-  <script src="js/data.js?v=25"></script>
-  <script src="js/main.js?v=25"></script>
+  <script src="js/data.js?v=29"></script>
+  <script src="js/main.js?v=29"></script>
 </body>
 </html>

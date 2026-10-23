@@ -83,15 +83,12 @@
     el.classList.remove("flash");
     void el.offsetWidth;
     el.classList.add("flash");
-    if (item.id === "system") return toggleSound();
     open(item.id);
   }
 
   function toggleSound() {
     state.sound = !state.sound;
     $("#sound-label").textContent = `Suara: ${state.sound ? "ON" : "OFF"}`;
-    D.menu.find((m) => m.id === "system").desc = `Efek suara sekarang ${state.sound ? "ON" : "OFF"}. Tekan lagi untuk mengubah.`;
-    $("#menu-desc").textContent = D.menu[state.menu].desc;
     sfx.confirm();
   }
 
@@ -131,6 +128,7 @@
       if (id === "project") renderProjects();
       if (id === "skills") renderSkills();
       if (id === "contact") renderContact();
+      if (id === "photography") renderPhoto();
     });
   }
 
@@ -273,11 +271,208 @@
     $$("a.mail-row", mailList).forEach((a, j) => a.classList.toggle("active", j === i));
   }
 
+  // ---------- PHOTOGRAPHY ----------
+  const PH = D.photography;
+  const ICONS = {
+    triangle: '<polygon points="12,4.5 20.5,19 3.5,19"/>',
+    circle: '<circle cx="12" cy="12" r="7.5"/>',
+    cross: '<path d="M6 6l12 12M18 6L6 18"/>',
+    square: '<rect x="5" y="5" width="14" height="14"/>',
+    dpad: '<path d="M9.5 3h5v6.5H21v5h-6.5V21h-5v-6.5H3v-5h6.5z"/>',
+  };
+  const pmMenu = $("#pm-menu");
+  const pmChips = $("#pm-chips");
+  const hintBar = $("#pm-hint-bar");
+  const photosFor = (id) => (id === "all" ? PH.photos : PH.photos.filter((p) => p.category === id));
+  const hintFor = (b) => (b.type === "about" ? b.hint : `${b.hint} · ${photosFor(b.id).length} foto`);
+  const photoButtons = () => $$(".pm-btn", pmMenu);
+
+  $("#pm-person").innerHTML = PH.person ? `<img src="${PH.person}" alt="" fetchpriority="high">` : "";
+  pmMenu.innerHTML = PH.buttons
+    .map((b, i) => {
+      const letters = [...b.label]
+        .map((c, j) => `<span class="ch${j === b.invert - 1 ? " inv" : ""}">${c}</span>`)
+        .join("");
+      const icon = b.icon
+        ? `<span class="pm-icon pm-icon-${b.icon}" aria-hidden="true"><svg viewBox="0 0 24 24">${ICONS[b.icon]}</svg></span>`
+        : "";
+      const badge = b.badge ? `<span class="pm-badge" aria-hidden="true">${b.badge}</span>` : "";
+      const end = b.iconSide === "end";
+      return `<button class="pm-btn pm-${b.id}" data-id="${b.id}" style="--x:${b.x};--y:${b.y};--i:${i}"
+          aria-label="${b.label}: ${hintFor(b)}">
+        ${end ? "" : icon}
+        <span class="pm-text" aria-hidden="true"><span class="pm-label">${letters}</span><span class="pm-jp">${b.jp}</span></span>
+        ${end ? icon : ""}${badge}
+        <span class="pm-hint" aria-hidden="true">${hintFor(b)}</span>
+      </button>`;
+    })
+    .join("");
+  pmChips.innerHTML = PH.buttons
+    .map((b) => `<button class="pm-chip" data-id="${b.id}">${b.label}<small>${hintFor(b)}</small></button>`)
+    .join("");
+
+  function showHint(btn) {
+    const b = PH.buttons.find((x) => x.id === btn.dataset.id);
+    hintBar.innerHTML = `<b>${b.label}</b> ${hintFor(b)}`;
+  }
+  $$(".pm-btn, .pm-chip").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.classList.remove("press");
+      void btn.offsetWidth;
+      btn.classList.add("press");
+      openCategory(btn.dataset.id, btn);
+    });
+    btn.addEventListener("focus", () => {
+      showHint(btn);
+      if (state.view === "photography" && !state.overlay) sfx.move();
+    });
+    btn.addEventListener("mouseenter", () => showHint(btn));
+  });
+
+  function renderPhoto() {
+    showHint(photoButtons()[0]);
+    setTimeout(() => photoButtons()[0].focus({ preventScroll: true }), 50);
+  }
+
+  // --- Overlay: galeri, profil, lightbox ---
+  const gallery = $("#gallery");
+  const galleryBody = $("#gallery-body");
+  const lightbox = $("#lightbox");
+  const lb = { list: [], i: 0, trigger: null };
+  let galleryTrigger = null;
+
+  function lockScroll(on) {
+    document.body.classList.toggle("locked", on);
+  }
+
+  function openCategory(id, trigger) {
+    const b = PH.buttons.find((x) => x.id === id);
+    galleryTrigger = trigger;
+    $("#gallery-tag").textContent = b.label;
+    $("#gallery-title").textContent = b.title;
+    if (b.type === "about") {
+      $("#gallery-count").textContent = "";
+      galleryBody.innerHTML = aboutPanel();
+    } else {
+      const list = photosFor(id);
+      lb.list = list;
+      $("#gallery-count").textContent = `${list.length} foto`;
+      galleryBody.innerHTML = list.length
+        ? `<ul class="g-grid">${list
+            .map(
+              (p, i) => `<li><button class="g-item" data-i="${i}" style="aspect-ratio:${p.width} / ${p.height}"
+                aria-label="Buka foto: ${p.title}">
+                <img src="${p.thumbnail || p.src}" alt="${p.alt}" width="${p.width}" height="${p.height}" loading="lazy" decoding="async">
+                <span class="g-cap">${p.title}</span>
+              </button></li>`
+            )
+            .join("")}</ul>`
+        : `<div class="g-empty"><strong>Belum ada karya</strong><p>Kategori ${b.title} masih kosong. Karya baru akan muncul di sini.</p></div>`;
+      $$(".g-item", galleryBody).forEach((el) => el.addEventListener("click", () => openLightbox(+el.dataset.i, el)));
+    }
+    gallery.hidden = false;
+    gallery.classList.remove("show");
+    void gallery.offsetWidth;
+    gallery.classList.add("show");
+    galleryBody.scrollTop = 0;
+    state.overlay = "gallery";
+    lockScroll(true);
+    sfx.confirm();
+    $("#gallery-close").focus();
+  }
+
+  function aboutPanel() {
+    const pr = D.profile;
+    const award = pr.stats.find(([k]) => k === "AWARD");
+    return `<div class="g-about">
+      ${pr.photo ? `<img class="g-about-photo" src="${pr.photo}" alt="${pr.name}">` : ""}
+      <div>
+        <h3>${pr.name}</h3>
+        <p class="g-about-role">${pr.role}</p>
+        ${award ? `<p class="g-about-award">${award[1]}</p>` : ""}
+        <p>${pr.bio[0]}</p>
+        <ul class="g-about-links">${D.contact
+          .map((c) => `<li><a href="${c.href}" target="_blank" rel="noopener"><b>${c.app}</b> ${c.handle}</a></li>`)
+          .join("")}</ul>
+      </div>
+    </div>`;
+  }
+
+  function closeGallery() {
+    gallery.hidden = true;
+    state.overlay = null;
+    lockScroll(false);
+    sfx.back();
+    if (galleryTrigger) galleryTrigger.focus({ preventScroll: true });
+  }
+
+  function openLightbox(i, trigger) {
+    lb.trigger = trigger;
+    lightbox.hidden = false;
+    state.overlay = "lightbox";
+    showPhoto(i);
+    $("#lb-close").focus();
+  }
+
+  function showPhoto(i) {
+    const n = lb.list.length;
+    lb.i = (i + n) % n;
+    const p = lb.list[lb.i];
+    const img = $("#lb-img");
+    img.classList.remove("broken");
+    img.src = p.src;
+    img.alt = p.alt;
+    $("#lb-title").textContent = p.title;
+    $("#lb-counter").textContent = `${lb.i + 1} / ${n}`;
+    $("#lb-meta").textContent = [p.location, p.year, p.description].filter(Boolean).join(" · ");
+    const single = n < 2;
+    $("#lb-prev").hidden = single;
+    $("#lb-next").hidden = single;
+  }
+
+  function closeLightbox() {
+    lightbox.hidden = true;
+    state.overlay = "gallery";
+    sfx.back();
+    if (lb.trigger) lb.trigger.focus({ preventScroll: true });
+  }
+
+  $("#gallery-close").addEventListener("click", closeGallery);
+  $("#lb-close").addEventListener("click", closeLightbox);
+  $("#lb-prev").addEventListener("click", () => (sfx.move(), showPhoto(lb.i - 1)));
+  $("#lb-next").addEventListener("click", () => (sfx.move(), showPhoto(lb.i + 1)));
+  lightbox.addEventListener("click", (e) => e.target === lightbox && closeLightbox());
+  $("#lb-img").addEventListener("error", (e) => e.target.classList.add("broken"));
+  // event error tidak bubble, jadi ditangkap di fase capture
+  galleryBody.addEventListener("error", (e) => e.target.closest(".g-item")?.classList.add("broken"), true);
+
+  function overlayKey(e, k) {
+    const box = state.overlay === "lightbox" ? lightbox : gallery;
+    if (k === "escape") {
+      e.preventDefault();
+      return state.overlay === "lightbox" ? closeLightbox() : closeGallery();
+    }
+    if (state.overlay === "lightbox" && (k === "arrowleft" || k === "arrowright")) {
+      e.preventDefault();
+      sfx.move();
+      return showPhoto(lb.i + (k === "arrowright" ? 1 : -1));
+    }
+    // jaga fokus tetap di dalam overlay
+    if (k === "tab") {
+      const f = $$("button:not([hidden]), a[href]", box).filter((el) => el.offsetParent !== null);
+      if (!f.length) return;
+      const first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) (e.preventDefault(), last.focus());
+      else if (!e.shiftKey && document.activeElement === last) (e.preventDefault(), first.focus());
+    }
+  }
+
   // ---------- Keyboard ----------
   addEventListener("keydown", (e) => {
     const k = e.key.toLowerCase();
     if (state.view === "loading") return state.ready && start();
     if (state.busy) return;
+    if (state.overlay) return overlayKey(e, k);
     const up = k === "arrowup" || k === "w";
     const down = k === "arrowdown" || k === "s";
     const ok = k === "enter" || k === " ";
@@ -308,6 +503,20 @@
         else if (ok) $$("a.mail-row", mailList)[state.mail].click();
         else if (esc) back();
         break;
+      case "photography": {
+        const btns = photoButtons();
+        const cur = btns.indexOf(document.activeElement);
+        const prev = up || k === "arrowleft";
+        const next = down || k === "arrowright";
+        if (prev || next) {
+          e.preventDefault();
+          const n = cur < 0 ? 0 : (cur + (next ? 1 : -1) + btns.length) % btns.length;
+          btns[n].focus();
+        } else if (ok && document.activeElement.matches(".pm-btn, .pm-chip")) {
+          document.activeElement.click();
+        } else if (esc) back();
+        break;
+      }
       default:
         if (esc) back();
     }
