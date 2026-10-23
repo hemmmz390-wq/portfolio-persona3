@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Portfolio | Pause Menu</title>
+  <meta name="description" content="Portfolio bergaya pause menu Persona 3 Reload, dibuat dengan HTML, CSS, dan JavaScript murni.">
+  <meta name="theme-color" content="#001233">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,800;1,700;1,800;1,900&family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css?v=25">
+</head>
+<body>
+  <!-- Latar laut: gradien + sinar cahaya + gelembung (diisi JS) -->
+  <div class="ocean" aria-hidden="true">
+    <div class="ocean-surface">
+      <svg viewBox="0 0 1600 420" preserveAspectRatio="xMidYMin slice">
+        <filter id="caustic" x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency=".0045 .028" numOctaves="2" seed="7"/>
+          <feColorMatrix type="matrix" values="0 0 0 0 .78  0 0 0 0 .96  0 0 0 0 1  22 0 0 0 -11.6"/>
+        </filter>
+        <rect width="200%" height="100%" filter="url(#caustic)"/>
+      </svg>
+    </div>
+    <div class="ocean-rays"></div>
+    <div class="ocean-caustics"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <!-- Loading -->
+  <section id="loading" class="loading" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="loading-hud">
+      <h2 class="loading-title">NOW LOADING<span class="dots"><i>.</i><i>.</i><i>.</i></span></h2>
+      <div class="loading-track"><div class="loading-fill" id="loading-fill"></div></div>
+      <span class="loading-percent" id="loading-percent">0%</span>
+    </div>
+    <button class="press-start" id="press-start" hidden>PRESS ANY KEY</button>
+  </section>
+
+  <!-- Menu utama -->
+  <main id="menu" class="menu-screen" aria-label="Menu utama">
+    <div class="hero-bg" id="hero-bg" aria-hidden="true"></div>
+    <div class="side-number" id="side-number" aria-hidden="true">01</div>
+    <div class="character" id="character" aria-hidden="true"></div>
+
+    <header class="profile-header">
+      <span class="profile-name" data-bind="name"></span>
+      <span class="profile-line"></span>
+      <span class="profile-role" data-bind="role"></span>
+    </header>
+
+    <nav class="menu-column" id="menu-column">
+      <ul class="menu-list" id="menu-list" role="menu"></ul>
+    </nav>
+
+    <p class="menu-desc" id="menu-desc"></p>
+
+    <div class="hud">
+      <span class="key">↑↓</span><span>Pilih</span>
+      <span class="key">ENTER</span><span>Konfirmasi</span>
+      <span class="key">M</span><span id="sound-label">Suara: ON</span>
+    </div>
+  </main>
+
+  <!-- PROJECT -->
+  <section id="screen-project" class="screen" aria-hidden="true">
+    <div class="screen-name" data-bind="name"></div>
+    <div class="banner"><div class="shard sh-a"></div><div class="shard sh-b"></div><div class="shard sh-c"></div><h1>PROJECT</h1></div>
+    <div class="project-layout">
+      <ul class="project-list" id="project-list" role="tablist"></ul>
+      <article class="project-detail" id="project-detail" aria-live="polite"></article>
+    </div>
+    <div class="hud hud-bottom">
+      <span class="key">↑↓</span><span>Pilih</span>
+      <span class="key">ENTER</span><span>Buka</span>
+      <button class="key key-btn" data-back>ESC</button><span>Kembali</span>
+    </div>
+  </section>
+
+  <!-- SKILLS -->
+  <section id="screen-skills" class="screen" aria-hidden="true">
+    <div class="screen-name" data-bind="name"></div>
+    <div class="banner banner-alt"><div class="shard sh-a"></div><div class="shard sh-b"></div><div class="shard sh-c"></div><h1>SKILLS</h1></div>
+    <nav class="skill-tabs" id="skill-tabs" role="tablist"></nav>
+    <div class="skill-grid" id="skill-grid"></div>
+    <div class="hud hud-bottom">
+      <button class="key key-btn" id="tab-prev">Q</button><span>Prev</span>
+      <button class="key key-btn" id="tab-next">E</button><span>Next</span>
+      <button class="key key-btn" data-back>ESC</button><span>Kembali</span>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="screen-about" class="screen" aria-hidden="true">
+    <div class="banner"><div class="shard sh-a"></div><div class="shard sh-b"></div><div class="shard sh-c"></div><h1>ABOUT</h1></div>
+    <div class="about-card">
+      <div class="about-top">
+        <div class="photo" id="photo"></div>
+        <div>
+          <h2 class="about-name" data-bind="name"></h2>
+          <p class="about-role" data-bind="role"></p>
+          <dl class="about-stats" id="about-stats"></dl>
+        </div>
+      </div>
+      <div class="about-bio" id="about-bio"></div>
+      <figure class="about-quote">
+        <blockquote id="quote-text"></blockquote>
+        <figcaption id="quote-author"></figcaption>
+      </figure>
+    </div>
+    <div class="hud hud-bottom">
+      <button class="key key-btn" data-back>ESC</button><span>Kembali</span>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="screen-contact" class="screen" aria-hidden="true">
+    <div class="phone">
+      <div class="phone-body">
+        <div class="phone-top"><span>MAIL</span><span class="phone-clock" id="phone-clock"></span></div>
+        <div class="phone-watermark" aria-hidden="true">MAIL</div>
+        <ul class="mail-list" id="mail-list"></ul>
+      </div>
+    </div>
+    <div class="hud hud-bottom">
+      <span class="key">↑↓</span><span>Pilih</span>
+      <span class="key">ENTER</span><span>Buka</span>
+      <button class="key key-btn" data-back>ESC</button><span>Kembali</span>
+    </div>
+  </section>
+
+  <!-- Transisi sapuan diagonal -->
+  <div class="wipe" id="wipe" aria-hidden="true"><div class="wipe-a"></div><div class="wipe-b"></div><div class="wipe-c"></div></div>
+
+  <script src="js/data.js?v=25"></script>
+  <script src="js/main.js?v=25"></script>
+</body>
+</html>
