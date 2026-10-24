@@ -109,8 +109,49 @@
   function toggleSound() {
     state.sound = !state.sound;
     $("#sound-label").textContent = `Suara: ${state.sound ? "ON" : "OFF"}`;
+    $("#sound-toggle").setAttribute("aria-pressed", state.sound);
     sfx.confirm();
+    music(state.sound);
   }
+  $("#sound-toggle").addEventListener("click", (e) => {
+    e.currentTarget.blur();
+    toggleSound();
+  });
+
+  // ---------- Backsound ----------
+  // Browser memblokir audio otomatis, jadi lagu baru diputar setelah "PRESS ANY KEY".
+  const bgm = D.profile.music ? new Audio(D.profile.music) : null;
+  const bgmVolume = D.profile.musicVolume ?? 0.35;
+  let musicStarted = false;
+  let fadeTimer;
+  if (bgm) {
+    bgm.loop = true;
+    bgm.preload = "auto";
+    bgm.volume = 0;
+  }
+  function fadeTo(target, ms, done) {
+    clearInterval(fadeTimer);
+    const from = bgm.volume;
+    const t0 = performance.now();
+    fadeTimer = setInterval(() => {
+      const k = Math.min(1, (performance.now() - t0) / ms);
+      bgm.volume = from + (target - from) * k;
+      if (k === 1) {
+        clearInterval(fadeTimer);
+        done && done();
+      }
+    }, 30);
+  }
+  function music(on) {
+    if (!bgm || !musicStarted) return;
+    if (on) {
+      bgm.play().then(() => fadeTo(bgmVolume, 1200)).catch(() => {});
+    } else {
+      fadeTo(0, 400, () => bgm.pause());
+    }
+  }
+  // jeda saat tab disembunyikan, lanjut saat kembali
+  document.addEventListener("visibilitychange", () => music(state.sound && document.visibilityState === "visible"));
 
   // Parallax ringan mengikuti mouse
   addEventListener("mousemove", (e) => {
@@ -559,6 +600,8 @@
     if (state.view !== "loading") return;
     state.view = "menu";
     sfx.start();
+    musicStarted = true;
+    music(state.sound);
     loading.classList.add("done");
     $("#menu").classList.add("ready");
     setMenu(0, true);

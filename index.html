@@ -25,7 +25,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,800;1,700;1,800;1,900&family=Poppins:ital,wght@0,300;0,400;0,600;1,400&display=swap" rel="stylesheet">
   <link rel="preload" as="image" href="assets/hero.webp">
-  <link rel="stylesheet" href="css/style.css?v=42">
+  <link rel="stylesheet" href="css/style.css?v=43">
 </head>
 <body>
   <!-- Latar laut: gradien + sinar cahaya + gelembung (diisi JS) -->
@@ -75,7 +75,7 @@
     <div class="hud">
       <span class="key">↑↓</span><span>Pilih</span>
       <span class="key">ENTER</span><span>Konfirmasi</span>
-      <span class="key">M</span><span id="sound-label">Suara: ON</span>
+      <button class="sound-toggle" id="sound-toggle" aria-pressed="true"><span class="key">M</span><span id="sound-label">Suara: ON</span></button>
     </div>
   </main>
 
@@ -198,7 +198,7 @@
   <!-- Transisi sapuan diagonal -->
   <div class="wipe" id="wipe" aria-hidden="true"><div class="wipe-a"></div><div class="wipe-b"></div><div class="wipe-c"></div></div>
 
-  <script src="js/data.js?v=42"></script>
-  <script src="js/main.js?v=42"></script>
+  <script src="js/data.js?v=43"></script>
+  <script src="js/main.js?v=43"></script>
 </body>
 </html>
