@@ -7,7 +7,7 @@ window.PORTFOLIO = {
     hero: "assets/hero.webp", // gambar latar penuh menu utama (subjek di kiri, kanan kosong untuk menu) — kosongkan untuk latar laut biasa
     heroVideo: "assets/hero.mp4", // video latar menu utama (loop, tanpa suara); `hero` dipakai sebagai poster & cadangan — kosongkan untuk foto saja
     music: "assets/audio/bgm.mp3", // backsound (loop); mulai setelah pengunjung menekan tombol pertama — kosongkan untuk tanpa lagu
-    musicVolume: 0.35, // 0–1
+    musicVolume: 0.2, // 0–1 (dibuat pelan supaya suara tombol tetap terdengar)
     character: "", // isi "assets/character-toon.webp" untuk menampilkan karakter lagi (dibuat dengan tools/toonify.py)
     characterPose: "float", // "float" = melayang terbalik di air (ala P3R), "stand" = berdiri tegak
     stats: [

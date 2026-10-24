@@ -24,7 +24,7 @@
     });
   }
   const sfx = {
-    move: () => tone([1320], { dur: 0.04, vol: 0.03 }),
+    move: () => tone([1320], { dur: 0.04, vol: 0.05 }),
     confirm: () => tone([660, 990, 1480], { type: "triangle", dur: 0.12, gap: 0.05, vol: 0.08 }),
     back: () => tone([880, 520], { type: "triangle", dur: 0.1, gap: 0.06, vol: 0.07 }),
     start: () => tone([392, 523, 784, 1046], { type: "sawtooth", dur: 0.18, gap: 0.07, vol: 0.04 }),
@@ -121,7 +121,7 @@
   // ---------- Backsound ----------
   // Browser memblokir audio otomatis, jadi lagu baru diputar setelah "PRESS ANY KEY".
   const bgm = D.profile.music ? new Audio(D.profile.music) : null;
-  const bgmVolume = D.profile.musicVolume ?? 0.35;
+  const bgmVolume = D.profile.musicVolume ?? 0.2;
   let musicStarted = false;
   let fadeTimer;
   if (bgm) {
